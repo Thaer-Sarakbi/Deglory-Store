@@ -3,16 +3,23 @@ import { Text, View, StyleSheet, StatusBar } from 'react-native';
 import AppContainer from './src/AppContainer';
 import { NavigationContainer } from '@react-navigation/native'
 import { Provider } from 'react-redux';
-import { createStore } from 'redux'
+import { createStore, compose, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
 import productsReducer from './src/store/productsReducer'
+import rootReducer from './src/store/rootReducer'
 
-const store = createStore(productsReducer)
+const store = createStore(rootReducer,
+   compose(
+     applyMiddleware(thunk)
+   ))
 
 const App = (props) => {
   return (
-    <NavigationContainer>
-      <AppContainer />
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <AppContainer />
+      </NavigationContainer>
+    </Provider>
   )
 }
 

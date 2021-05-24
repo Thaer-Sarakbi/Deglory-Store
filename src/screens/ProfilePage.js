@@ -3,27 +3,22 @@ import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import api from '../api';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUsers } from '../actions/userActions'
 
 const ProfilePage = (props) => {
   const url = `${api.url.wc}customers?consumer_key=${api.keys.consumerKey}&consumer_secret=${api.keys.consumerSecret}&id=2`;
-  //console.log(url)
 
-  const [user, setUser] = useState()
-  //console.log(user.first_name)
+  let user = useSelector((state) => state.userReducer.users)
+  const dispatch = useDispatch();
 
-  const getData = async() => {
-    await axios.get(url)
-    .then(response => {
-      //console.log(response);
-      setUser(response.data[0])
-    })
-  }
+  const getUser = () => dispatch(getUsers(url)) 
 
   useEffect(() => {
-    getData()
+    //getData()
+    getUser()
    }, [])
 
-  if(user){
     return (
       <View style={styles.container}>
         <Text style={styles.title}>My Profile</Text>
@@ -81,13 +76,6 @@ const ProfilePage = (props) => {
 
       </View>
     )
-  } else {
-    return(
-      <View>
-        <Text>Loading!!!</Text>
-      </View>
-    )
-  }
 }
 
 const styles = StyleSheet.create({

@@ -1,33 +1,44 @@
 import axios from 'axios';
 import React, { useState ,useEffect } from 'react';
-import { Text, View, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView, Alert, BackHandler } from 'react-native';
 import api from '../api';
 import Rating from '../components/Rating'
+import { useDispatch, useSelector } from 'react-redux';
+import { getProducts } from '../actions/actions';
 
 const HomePage = ({ navigation }) => {
-  const [data, setData] = useState('')
-  //console.log(data)
-
-  const maxRating= [1, 2, 3, 4, 5]
-  const starImgFailed = 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true'
-  const starImgCorner = 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true'
+  //const [data, setData] = useState('')
+  
+  let products = useSelector((state) => state.productsReducer.products)
+  //console.log(products)
 
   const url = `${api.url.wc}products?consumer_key=${api.keys.consumerKey}&consumer_secret=${api.keys.consumerSecret}`;
   
-  const getData = async() => {
-    await axios.get(url)
-    .then(response => {
-      //console.log(response);
-      setData(response.data)
-    })
-  }
+  const dispatch = useDispatch();
+
+  const getProduct = () => dispatch(getProducts(url)) 
 
   useEffect(() => {
-    getData()
+    //getData()
+    getProduct()
   }, [])
 
-  if(data){
-    //console.log(data.name)
+  const backAction = () => {
+    Alert.alert("Hold on!", "Are you sure you want to exit?", [
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel"
+      },
+      { text: "YES", onPress: () => BackHandler.exitApp() }
+    ]);
+    return true;
+  };
+
+   BackHandler.addEventListener("hardwareBackPress", backAction);
+
+   if(products){
+    //console.log(products)
     return (
       <ScrollView>
       <View style={styles.container}>
@@ -39,11 +50,11 @@ const HomePage = ({ navigation }) => {
         <View style= {{ paddingTop: 25, paddingHorizontal: 10 }}>
           <Text style= {{ fontSize: 30, fontWeight: 'bold' }}>Featured Products</Text>
           <FlatList 
-            data = {data}
+            data = {products}
             keyExtractor= {(item) => {return item.id}}
             horizontal
             renderItem = {({item}) => {
-              //console.log(item.id)
+              //console.log(item)
               if(item.featured === true){
                 return(
                   <TouchableOpacity style= {styles.featuredCard} onPress={() => navigation.navigate('productDetails', { id: item.id })}> 
@@ -66,7 +77,8 @@ const HomePage = ({ navigation }) => {
       </View>
       </ScrollView>
     )
-  } else {
+  } 
+  else {
     return(
       <View>
         <Text>Loading</Text>

@@ -1,1 +1,5 @@
 export const GET_PRODUCTS = 'GET_PRODUCTS';
+export const GET_PRODUCTS_DETAILS = 'GET_PRODUCTS_DETAILS';
+export const GET_REVIEWS = 'GET_REVIEWS';
+export const GET_USERS = 'GET_USERS';
+export const EMPTY_STATE = 'EMPTY_STATE'

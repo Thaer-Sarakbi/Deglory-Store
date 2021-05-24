@@ -1,57 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, useWindowDimensions, FlatList  } from 'react-native';
+import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, useWindowDimensions, BackHandler  } from 'react-native';
 import api from '../api';
-import axios from 'axios';
 import Swiper from 'react-native-swiper'
 import HTML from "react-native-render-html";
 import Rating from '../components/Rating';
+import { useDispatch, useSelector } from 'react-redux';
+import { getProductsDetails, getReviews, emptyState } from '../actions/actions';
  
-const ProductDetailsScreen = ({ route }) => {
-  //console.log(route.params.data)
+const ProductDetailsScreen = ({ route, navigation }) => {
+  //console.log(navigation)
   const id = route.params.id
 
   const url = `${api.url.wc}products/${id}?consumer_key=${api.keys.consumerKey}&consumer_secret=${api.keys.consumerSecret}`;
-  const url2 = `${api.url.wc}products/reviews?consumer_key=${api.keys.consumerKey}&consumer_secret=${api.keys.consumerSecret}&id=${id}`;
- 
+  const url2 = `${api.url.wc}products/reviews?consumer_key=${api.keys.consumerKey}&consumer_secret=${api.keys.consumerSecret}`;
 
-  const [data, setData] = useState('')
-  //console.log(data.related_ids)
+  let product = useSelector((state) => state.productsReducer.productDetails)
+  let reviews = useSelector((state) => state.productsReducer.reviews)
+  //console.log(url2)
+  
+  const dispatch = useDispatch();
 
-  const [reviews, setReviews] = useState([])
-  //console.log(reviews)
-
-  const getData = async() => {
-    await axios.get(url)
-    .then(response => {
-      //console.log(response);
-      setData(response.data)
-    })
-  }
-
-  const getReviews = () => {
-    axios.get(url2)
-    .then(res => {
-      //console.log(res.data)
-      setReviews(res.data)
-    })
-  }
+  const getProduct = () => dispatch(getProductsDetails(url)) 
+  const getReview = () => dispatch(getReviews(url2)) 
+  const emptyStates = () => dispatch(emptyState())
 
   useEffect(() => {
-    getData()
-    getReviews()
+    getProduct()
+    getReview()
    }, [])
 
    const contentWidth = useWindowDimensions().width;
- 
-  if(data){
-  
+
+   const backAction = () => {
+    navigation.goBack()  
+    emptyStates()
+
+    return true;
+  };
+
+   BackHandler.addEventListener("hardwareBackPress", backAction);
+
+   if(product){
+    //console.log(product.categories[0].name)
     return (
       <ScrollView>
       <View style={styles.container}>
-      
+        
+        {/* <TouchableOpacity style={{ width: 50, height: 50 }} onPress={() =>  {
+          navigation.goBack()  
+          emptyStates()
+        }}>
+          <Text>H</Text>
+        </TouchableOpacity> */}
+
         <View style={styles.sliderContainer}>
         <Swiper autoplay  activeDotColor='#FF6347'> 
-        {data.images.map((image, index) => {
+        {product.images.map((image, index) => {
           
           return(
           <View key={index} style={styles.slide}>
@@ -69,49 +73,52 @@ const ProductDetailsScreen = ({ route }) => {
 
         <View style= {{ flexDirection: 'row', paddingHorizontal: 15, paddingTop: 10 }}>
           <View style = {{ flex: 3 }}>
-            <Text style= {{ fontSize: 20, fontWeight: 'bold' }}>{data.name}</Text>
-            <Text style= {{ color: '#9E9E9E', fontSize: 15 }}>{data.categories[0].name}</Text>
+            <Text style= {{ fontSize: 20, fontWeight: 'bold' }}>{product.name}</Text>
+            <Text style= {{ color: '#9E9E9E', fontSize: 15 }}>{product.categories[0].name}</Text>
             <Rating />
           </View>
           <View style = {{ flex: 1, alignItems: 'flex-end' }}>
-            <Text style = {{ textDecorationLine: 'line-through', fontSize: 18, color: '#FF6347' }}>{data.regular_price} RM</Text>
-            <Text style= {{ fontSize: 18 }}>{data.price} RM</Text>
+            <Text style = {{ textDecorationLine: 'line-through', fontSize: 18, color: '#FF6347' }}>{product.regular_price} RM</Text>
+            <Text style= {{ fontSize: 18 }}>{product.price} RM</Text>
           </View>
         </View>
 
         <View style= {{ paddingTop: 20 }}>
-          <HTML source={{ html: data.description }} contentWidth={contentWidth}  tagsStyles={{ section: { fontWeight: 'bold' }}}  />
+          <HTML source={{ html: product.description }} contentWidth={contentWidth} tagsStyles={{ section: { fontWeight: 'bold' }}}  />
         </View>
 
         <View style={styles.reviewsContainer}>
-          <Text style={styles.reviewsText}>{reviews.length} Reviews</Text>
+          <Text style={styles.reviewsText}> Reviews</Text>
           
-            {reviews.map((review, index) => {
-              //console.log(review)
-              const avatar = review.reviewer_avatar_urls
-              const url = avatar[Object.keys(avatar)[1]]
-              //console.log(url)
-
-              const date = new Date(review.date_created)
-              var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-              const month = months[date.getMonth()]
-              const day = date.getDate()
-              const year = date.getFullYear()
-              return(
-                <View style= {styles.reviewBox} key={index}>
-                  <View style= {{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View>
-                      <Text style= {{ fontWeight: 'bold', fontSize: 20 }}>{review.reviewer}</Text>
-                      <Rating number= {review.rating} />
-                    </View>
-                    <Text style= {{ alignSelf: 'center', color: '#9E9E9E' }}>{month} {day}, {year}</Text>
-                  </View>
-                  <HTML source={{ html: review.review }} contentWidth={contentWidth} />
-                  <Image source={{ uri: url }} style={styles.avatar} />
-                </View>
-              )
+            {reviews.map((review) => {
+               if(review.product_id === id){
+                
+                 const avatar = review.reviewer_avatar_urls
+                 const url = avatar[Object.keys(avatar)[1]]
+   
+                 const date = new Date(review.date_created)
+                 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                 const month = months[date.getMonth()]
+                 const day = date.getDate()
+                 const year = date.getFullYear()
+                 return(
+                   <View style= {styles.reviewBox} key={review.id}>
+                     <View style= {{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                       <View>
+                         <Text style= {{ fontWeight: 'bold', fontSize: 20 }}>{review.reviewer}</Text>
+                         <Rating number= {review.rating} />
+                       </View>
+                       <Text style= {{ alignSelf: 'center', color: '#9E9E9E' }}>{month} {day}, {year}</Text>
+                     </View>
+                     <HTML source={{ html: review.review }} contentWidth={contentWidth} />
+                     <Image source={{ uri: url }} style={styles.avatar} />
+                   </View>
+                 )
+               }
             })}
         </View>
+      
+        
 
         <TouchableOpacity style={styles.addToCart}>
           <Text style={{ color: 'white', fontSize: 15 }}>ADD TO CART</Text>
