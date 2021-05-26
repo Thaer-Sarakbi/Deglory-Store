@@ -3,3 +3,5 @@ export const GET_PRODUCTS_DETAILS = 'GET_PRODUCTS_DETAILS';
 export const GET_REVIEWS = 'GET_REVIEWS';
 export const GET_USERS = 'GET_USERS';
 export const EMPTY_STATE = 'EMPTY_STATE'
+export const ADD_TO_CART = 'ADD_TO_CART'
+export const REMOVE_FROM_CART = 'REMOVE_FROM_CART'

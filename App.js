@@ -7,6 +7,7 @@ import { createStore, compose, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import productsReducer from './src/store/productsReducer'
 import rootReducer from './src/store/rootReducer'
+import { MenuProvider } from 'react-native-popup-menu';
 
 const store = createStore(rootReducer,
    compose(
@@ -17,7 +18,9 @@ const App = (props) => {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <AppContainer />
+        <MenuProvider>
+          <AppContainer />
+        </MenuProvider>
       </NavigationContainer>
     </Provider>
   )

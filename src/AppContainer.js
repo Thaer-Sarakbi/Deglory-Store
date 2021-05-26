@@ -7,65 +7,127 @@ import CartPage from './screens/CartPage'
 import ProfilePage from './screens/ProfilePage'
 import Icon from 'react-native-vector-icons/Ionicons';
 import homeStack from '../src/stacks/productStack';
+import { useSelector } from 'react-redux';
 
 const Tab = createBottomTabNavigator()
 
 const AppContainer = (props) => {
-  return (
-    <Tab.Navigator tabBarOptions={{
-        activeTintColor: '#DB3022',
-        //inactiveTintColor: '#fff',
-        inactiveBackgroundColor: 'white',
-        //activeBackgroundColor: '#FF8A65',
-      }}>
-      <Tab.Screen 
-        name="Home" 
-        component={homeStack} 
-        options={{
-            tabBarLabel: 'Home',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="home" color={color} size={30} />
-            )
-        }}
-      />
+  let orders = useSelector((state) => state.cartReducer.orders)
+  //console.log(orders.length)
 
-      <Tab.Screen 
-        name="CartPage" 
-        component={CartPage} 
-        options={{
-            tabBarLabel: 'Cart',
-            labelStyle: {
-              color: '#DB3022'
-            },
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="cart" color={color} size={30} />
-            )
-        }}
-      />
-
-      <Tab.Screen 
-        name="WhishListPage" 
-        component={WhishListPage}
-        options={{
-            tabBarLabel: 'WhishList',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="heart" color={color} size={30} />
-            )
-        }} 
-      />
-
-      <Tab.Screen 
-        name="ProfilePage" 
-        component={ProfilePage}
-        options={{
-            tabBarLabel: 'Profile',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="person" color={color} size={30} />
-            )
-        }} 
-      />
-    </Tab.Navigator>
-  )
+  if(orders.length > 0){
+    return (
+      <Tab.Navigator tabBarOptions={{
+          activeTintColor: '#DB3022',
+          inactiveBackgroundColor: 'white'
+        }}>
+        <Tab.Screen 
+          name="Home" 
+          component={homeStack} 
+          options={{
+              tabBarLabel: 'Home',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="home" color={color} size={30} />
+              )
+          }}
+        />
+  
+        <Tab.Screen 
+          name="CartPage" 
+          component={CartPage} 
+          
+          options={{
+              tabBarLabel: 'Cart',
+              labelStyle: {
+                color: '#DB3022'
+              },
+              tabBarBadge: orders.length,
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="cart" color={color} size={30} />
+              )
+          }}
+        />
+  
+        <Tab.Screen 
+          name="WhishListPage" 
+          component={WhishListPage}
+          options={{
+              tabBarLabel: 'WhishList',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="heart" color={color} size={30} />
+              )
+          }} 
+        />
+  
+        <Tab.Screen 
+          name="ProfilePage" 
+          component={ProfilePage}
+          options={{
+              tabBarLabel: 'Profile',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="person" color={color} size={30} />
+              )
+          }} 
+        />
+      </Tab.Navigator>
+    )
+  } else {
+    return (
+      <Tab.Navigator tabBarOptions={{
+          activeTintColor: '#DB3022',
+          inactiveBackgroundColor: 'white'
+        }}>
+        <Tab.Screen 
+          name="Home" 
+          component={homeStack} 
+          options={{
+              tabBarLabel: 'Home',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="home" color={color} size={30} />
+              )
+          }}
+        />
+  
+        <Tab.Screen 
+          name="CartPage" 
+          component={CartPage} 
+          
+          options={{
+              tabBarLabel: 'Cart',
+              labelStyle: {
+                color: '#DB3022'
+              },
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="cart" color={color} size={30} />
+              )
+          }}
+        />
+  
+        <Tab.Screen 
+          name="WhishListPage" 
+          component={WhishListPage}
+          options={{
+              tabBarLabel: 'WhishList',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="heart" color={color} size={30} />
+              )
+          }} 
+        />
+  
+        <Tab.Screen 
+          name="ProfilePage" 
+          component={ProfilePage}
+          options={{
+              tabBarLabel: 'Profile',
+              tabBarIcon: ({ color, size }) => (
+                <Icon name="person" color={color} size={30} />
+              )
+          }} 
+        />
+      </Tab.Navigator>
+    )
+  }
+  
 
 }
 

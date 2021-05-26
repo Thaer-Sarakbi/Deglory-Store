@@ -6,6 +6,7 @@ import HTML from "react-native-render-html";
 import Rating from '../components/Rating';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProductsDetails, getReviews, emptyState } from '../actions/actions';
+import { cartActions } from '../actions/cartActions'
  
 const ProductDetailsScreen = ({ route, navigation }) => {
   //console.log(navigation)
@@ -23,6 +24,7 @@ const ProductDetailsScreen = ({ route, navigation }) => {
   const getProduct = () => dispatch(getProductsDetails(url)) 
   const getReview = () => dispatch(getReviews(url2)) 
   const emptyStates = () => dispatch(emptyState())
+  const addToCart = () => dispatch(cartActions(product))
 
   useEffect(() => {
     getProduct()
@@ -34,7 +36,7 @@ const ProductDetailsScreen = ({ route, navigation }) => {
    const backAction = () => {
     navigation.goBack()  
     emptyStates()
-
+    
     return true;
   };
 
@@ -117,10 +119,8 @@ const ProductDetailsScreen = ({ route, navigation }) => {
                }
             })}
         </View>
-      
-        
 
-        <TouchableOpacity style={styles.addToCart}>
+        <TouchableOpacity style={styles.addToCart} onPress={() => addToCart()}>
           <Text style={{ color: 'white', fontSize: 15 }}>ADD TO CART</Text>
         </TouchableOpacity>
         
